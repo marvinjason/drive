@@ -1,0 +1,21 @@
+
+function initMap(){
+	var center = {lat: 14.590848, lng: 121.060800}; 
+    var map = new google.maps.Map(document.getElementById('map'), {
+      zoom: 10,
+      center: center
+    });
+
+    <% headers = {'Authorization' => 'Token 71768b8658e0251306c821c84c3890f8ba53af08'} %>
+    <% response = HTTParty.get('https://roadsafety.io/api/records?archived=False&details_only=True&limit=10000', :headers => headers) %>
+    <% response['results'].each do |record| %>
+
+    	var point = {lng: <%= record['geom']['coordinates'][0] %>, lat: <%= record['geom']['coordinates'][1] %>};
+    	
+    	var marker = new google.maps.Marker({
+	      position: point,
+	      map: map
+	    });
+
+    <% end %>
+}
