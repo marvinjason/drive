@@ -19,7 +19,8 @@ vertical-align: middle;
 white-space: nowrap;
 }
 .container-4 input#search{
-width: 285px;
+margin: 7px 0px 0px 7px;
+width: 270px; /*285px;*/
 height: 50px;
 background: #2b303b;
 border: none;
@@ -55,6 +56,7 @@ background: #232833;
 height: 50px;
 width: 50px;
 color: #4f5b66;
+margin-top: 7px;
 opacity: 0;
 font-size: 10pt;
 -webkit-transition: all .55s ease;
@@ -66,6 +68,7 @@ transition: all .55s ease;
 .container-4:hover button.icon, .container-4:active button.icon, .container-4:focus button.icon{
 outline: none;
 opacity: 1;
+margin-top: 7px;
 margin-left: -50px;
 }
 .container-4:hover button.icon:hover{

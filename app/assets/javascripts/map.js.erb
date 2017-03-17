@@ -1,13 +1,18 @@
+var markers = new Array();
+var map;
 
 function initMap(){
 	var center = {lat: 14.590848, lng: 121.060800}; 
-    var map = new google.maps.Map(document.getElementById('map'), {
+    map = new google.maps.Map(document.getElementById('map'), {
       zoom: 10,
       center: center
     });
 
     <% headers = {'Authorization' => 'Token 71768b8658e0251306c821c84c3890f8ba53af08'} %>
-    <% response = HTTParty.get('https://roadsafety.io/api/records?archived=False&details_only=True&limit=10000', :headers => headers) %>
+    <% response = HTTParty.get("https://roadsafety.io/api/records?archived=False&details_only=True&limit=10000&occurred_min=#{(Time.now.beginning_of_week - 1.day).utc.iso8601}", :headers => headers) %>
+
+    $('#this-week').text('<%= response['results'].count %>');
+
     <% response['results'].each do |record| %>
 
     	var point = {lng: <%= record['geom']['coordinates'][0] %>, lat: <%= record['geom']['coordinates'][1] %>};
@@ -17,5 +22,87 @@ function initMap(){
 	      map: map
 	    });
 
+        markers.push(marker);
+
     <% end %>
+
+    <% response = HTTParty.get("https://roadsafety.io/api/records?archived=False&details_only=True&limit=10000&occurred_min=#{Time.now.beginning_of_month.utc.iso8601}", :headers => headers) %>
+    $('#this-month').text('<%= response['results'].count %>');
+
+    <% response = HTTParty.get("https://roadsafety.io/api/records?archived=False&details_only=True&limit=10000&occurred_min=#{Time.now.beginning_of_day.utc.iso8601}", :headers => headers) %>
+    $('#go-live').text('<%= response['results'].count %>');
+
+    <% response = HTTParty.get("https://roadsafety.io/api/records?archived=False&details_only=True&limit=1", :headers => headers) %>
+    $('#incidents').text('<%= response['count'] %>');
 }
+
+function clearMap(){
+    for (var i = 0; i < markers.length; i++){
+        markers[i].setMap(null);
+    }
+    markers = new Array();
+}
+
+$(function(){
+
+    $('#incidents-anchor').on('click', function(e){
+        e.preventDefault();
+    });
+
+    $('#week').on('click', function(e){
+        e.preventDefault();
+        clearMap();
+
+        <% response = HTTParty.get("https://roadsafety.io/api/records?archived=False&details_only=True&limit=10000&occurred_min=#{(Time.now.beginning_of_week - 1.day).utc.iso8601}", :headers => headers) %>
+        <% response['results'].each do |record| %>
+
+            var point = {lng: <%= record['geom']['coordinates'][0] %>, lat: <%= record['geom']['coordinates'][1] %>};
+            
+            var marker = new google.maps.Marker({
+              position: point,
+              map: map
+            });
+
+            markers.push(marker);
+
+        <% end %>
+    });
+
+    $('#month').on('click', function(e){
+        e.preventDefault();
+        clearMap();
+
+        <% response = HTTParty.get("https://roadsafety.io/api/records?archived=False&details_only=True&limit=10000&occurred_min=#{Time.now.beginning_of_month.utc.iso8601}", :headers => headers) %>
+        <% response['results'].each do |record| %>
+
+            var point = {lng: <%= record['geom']['coordinates'][0] %>, lat: <%= record['geom']['coordinates'][1] %>};
+            
+            var marker = new google.maps.Marker({
+              position: point,
+              map: map
+            });
+
+            markers.push(marker);
+
+        <% end %>
+    });
+
+    $('#live').on('click', function(e){
+        e.preventDefault();
+        clearMap();
+
+        <% response = HTTParty.get("https://roadsafety.io/api/records?archived=False&details_only=True&limit=10000&occurred_min=#{Time.now.beginning_of_day.utc.iso8601}", :headers => headers) %>
+        <% response['results'].each do |record| %>
+
+            var point = {lng: <%= record['geom']['coordinates'][0] %>, lat: <%= record['geom']['coordinates'][1] %>};
+            
+            var marker = new google.maps.Marker({
+              position: point,
+              map: map
+            });
+
+            markers.push(marker);
+
+        <% end %>
+    });
+});
