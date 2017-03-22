@@ -8,7 +8,7 @@ function initMap(){
       center: center
     });
 
-    <% headers = {'Authorization' => 'Token 71768b8658e0251306c821c84c3890f8ba53af08'} %>
+    <% headers = {'Authorization' => "Token #{Rails.application.secrets.access_token}"} %>
     <% response = HTTParty.get("https://roadsafety.io/api/records?archived=False&details_only=True&limit=10000&occurred_min=#{(Time.now.beginning_of_week - 1.day).utc.iso8601}", :headers => headers) %>
 
     $('#this-week').text('<%= response['results'].count %>');
@@ -21,6 +21,14 @@ function initMap(){
 	      position: point,
 	      map: map
 	    });
+
+        var infowindow = new google.maps.InfoWindow({
+            content: "<%= record['location_text'] %>"
+        });
+
+        marker.addListener('click', function(){
+            infowindow.open(map, marker);
+        });
 
         markers.push(marker);
 
